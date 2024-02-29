@@ -1,0 +1,35 @@
+﻿@{
+    ViewData["Title"] = "STL Viewer";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+    </style>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.138.0/build/three.module.js",
+                "sTLLoader": "https://unpkg.com/three@0.154.0/examples/jsm/loaders/STLLoader.js"
+            }
+        }
+    </script>
+</head>
+<body>
+    <script type="module" src="~/js/site - Copy.js"></script>
+</body>
+</html>
