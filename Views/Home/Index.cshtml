@@ -1,4 +1,4 @@
-﻿@{
+﻿@*@{
     ViewData["Title"] = "STL Viewer";
 }
 
@@ -33,3 +33,98 @@
     <script type="module" src="~/js/site - Copy.js"></script>
 </body>
 </html>
+*@
+@{
+    ViewData["Title"] = "Upload and View STL";
+}
+
+<h2>@ViewData["Title"]]</h2>
+
+<input type="file" id="fileInput" accept=".stl" />
+<div id="container" style="width: 200px; height: 300px;"></div>
+
+@section Scripts {
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.138.0/build/three.module.js",
+                "sTLLoader": "https://unpkg.com/three@0.154.0/examples/jsm/loaders/STLLoader.js",
+                "orbitControls": "https://unpkg.com/three@0.154.0/examples/jsm/controls/OrbitControls.js"
+            }
+        }
+    </script>
+    <script type="module">
+        import * as THREE from 'three';
+        import { STLLoader } from 'sTLLoader';
+        import { OrbitControls } from 'orbitControls';
+        document.getElementById('fileInput').addEventListener('change', function (event) {
+            var file = event.target.files[0];
+            if (file) {
+                var reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onloadend = function (e) {
+                    var base64String = e.target.result;
+                    console.log(base64String);
+                    displaySTL(base64String.split("base64,")[1]);
+                };
+            }
+        });
+
+        function displaySTL(base64) {
+            var scene = new THREE.Scene();
+            var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+            var renderer = new THREE.WebGLRenderer();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            // Controls for zooming, rotating, and panning
+            var controls = new OrbitControls(camera, renderer.domElement);
+            //controls.dampingFactor = 0.25;
+            //controls.screenSpacePanning = false;
+            //controls.maxPolarAngle = Math.PI/2;
+            controls.minDistance = 2;
+            controls.maxDistance = 500;
+            //controls.enablePan = true;
+
+            var loader = new STLLoader();
+            loader.load("data:application/octet-stream;base64," + base64, function (geometry) {
+                var material = new THREE.MeshPhongMaterial({ color: 0x00ff55 });
+                var mesh = new THREE.Mesh(geometry, material);
+                scene.add(mesh);
+
+                // Adjust camera and controls
+                var boundingBox = new THREE.Box3().setFromObject(mesh);
+                var center = boundingBox.getCenter(new THREE.Vector3());
+                var size = boundingBox.getSize(new THREE.Vector3());
+
+                // Set camera position to encompass entire model
+                var maxDimension = Math.max(size.x, size.y, size.z);
+                var fov = camera.fov * (Math.PI);
+                var cameraDistance = Math.abs(maxDimension / Math.sin(fov / 2));
+                camera.position.copy(center);
+                camera.position.z += cameraDistance * 2;
+                camera.lookAt(center);
+                controls.target.copy(center);
+                controls.update();
+
+                // Lighting
+                var ambientLight = new THREE.AmbientLight(0x404040);
+                var directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+                scene.add(ambientLight);
+                scene.add(directionalLight);
+
+                animate();
+            });
+
+            function animate() {
+                requestAnimationFrame(animate);
+                controls.update();
+                render();
+            }
+
+            function render() {
+                renderer.render(scene, camera);
+            }
+        }
+    </script>
+}

@@ -8,7 +8,7 @@ namespace STLViewer.Controllers
     {
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ILogger<HomeController> logger)
+        /*public HomeController(ILogger<HomeController> logger)
         {
             _logger = logger;
         }
@@ -42,6 +42,28 @@ namespace STLViewer.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }*/
+
+        [HttpGet]
+        public IActionResult Index()
+        {
+            return View();
         }
+
+        //[HttpPost]
+        //public async Task<IActionResult> Index(IFormFile file)
+        //{
+        //    if (file != null && file.Length > 0)
+        //    {
+        //        using (var memoryStream = new MemoryStream())
+        //        {
+        //            await file.CopyToAsync(memoryStream);
+        //            var fileBytes = memoryStream.ToArray();
+        //            string base64 = Convert.ToBase64String(fileBytes);
+        //            return RedirectToAction("Privacy", new { modelData = base64 });
+        //        }
+        //    }
+        //    return View();
+        //}
     }
 }
